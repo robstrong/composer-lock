@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -70,10 +69,12 @@ func jsonError(w http.ResponseWriter, msg string, httpCode int) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	w.WriteHeader(httpCode)
 	_, err = w.Write(js)
 	if err != nil {
 		log.Print(err.Error())
 	}
+	log.Printf("Responded with error: %s", msg)
 }
 
 type ErrorResponse struct {
@@ -112,14 +113,12 @@ func GetLockJson(c []byte) ([]byte, error) {
 
 	//run composer install
 	log.Print("Start composer install")
-	var out bytes.Buffer
 	cmd := exec.Command(composerPath, "install")
 	cmd.Dir = path
-	cmd.Stderr = &out
-	err = cmd.Run()
+	out, err := cmd.CombinedOutput()
 	if err != nil {
 		if _, ok := err.(*exec.ExitError); ok {
-			return []byte{}, errors.New(out.String())
+			return []byte{}, errors.New(string(out))
 		} else {
 			return []byte{}, err
 		}
