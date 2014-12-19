@@ -1,0 +1,3 @@
+#!/bin/bash -e
+
+GOARCH=amd64 GOOS=linux go build -tags composer-lock -ldflags '-s' -o bin/composer-lock-linux-amd64 .
