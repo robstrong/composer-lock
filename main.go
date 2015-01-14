@@ -113,7 +113,7 @@ func GetLockJson(c []byte) ([]byte, error) {
 
 	//run composer install
 	log.Print("Start composer install")
-	cmd := exec.Command(composerPath, "install")
+	cmd := exec.Command(composerPath, "install", "--prefer-source", "--ignore-platform-reqs", "--no-scripts")
 	cmd.Dir = path
 	out, err := cmd.CombinedOutput()
 	if err != nil {
